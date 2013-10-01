@@ -17,6 +17,7 @@
     "url": "https://github.com/AWinterman/ping-pong/issues"
   },
   "dependencies": {
-    "sizzle": "~1.1.0"
+    "sizzle": "~1.1.0",
+    "mustache": "~0.7.2"
   }
 }

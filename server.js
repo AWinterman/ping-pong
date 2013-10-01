@@ -6,19 +6,12 @@ var hyperstream = require('hyperstream')
 var level = require('level')
 var ecstatic = require('ecstatic')({root: __dirname + '/static', showDir: true})
 var socketio = require('socket.io')
-var browserify = require('browserify')
-var brfs = require('brfs')
-var concat = require('concat-stream')
+var spawn = require('child_process').spawn
 
-// browserfying, should maybe consider writeSync...
-fs.watch('./', function() {
-  var b = browserify()
-  b.add('./browser/index')
-  b.transform(brfs)
-  b.bundle().pipe(concat(function(data) {
-    fs.writeSync(__dirname + '/static/bundle.js', Buffer(data))
-  }))
-})
+var browserify = spawn('browserify', ['-d', '-t', 'brfs', __dirname +'/browser/index.js'])
+
+browserify.stdout.pipe(fs.createWriteStream(__dirname + '/static/bundle.js'))
+browserify.stderr.pipe(process.stderr)
 
 var db = level('./players.db')
 
@@ -36,8 +29,9 @@ var server = http.createServer(function (req, res) {
 
 
 var io = socketio.listen(server)
-io.set('log level', 1)
-server.listen(8000)
+io.set('log level', 2)
+
+server.listen(7000)
 
 io.sockets.on('connection', commit)
 
@@ -48,19 +42,13 @@ function commit(socket) {
 
   function login(data) {
     if(!data || !data.nick || !data.email) {
-      return socket.emit('login failed', 'no login info')
+      return socket.emit('login')
     }
+
     db.get(data.nick, got)
 
     function got(err) {
       if(err) {
-        var players = db.createReadStream()
-          .pipe(exclude_current(data))
-
-        players.on('data', emit_player)
-        players.on('end', function() {
-          socket.emit('end players')
-        })
 
         socket.set('nick', data.nick, function() {
           db.put(data.nick, data.email, wrote)
@@ -70,7 +58,9 @@ function commit(socket) {
         return 
       }
 
-      return socket.emit('login failed', 'player exists')
+      socket.emit('login')
+      socket.emit('error', 'player exists')
+      return
     }
 
     function wrote(err) {
@@ -78,14 +68,14 @@ function commit(socket) {
         return process.exit(1)
       }
 
-      socket.emit('login success', 'success')
+      socket.emit('login', data)
+      console.log('login of ' + data.nick + ' a success')
     }
   }
 
   db.on('put', emit_player)
 
   function emit_player(data) {
-    console.log(data)
     var player = {}
 
     player.nick = data.key 
@@ -123,4 +113,10 @@ function logout(data) {
   function delete_player() {
     console.log('deleting', arguments)
   }
+}
+
+function display_payers() {
+  var players = db.createReadStream()
+
+  players.on('data', emit_player)
 }

@@ -1,3 +1,5 @@
+var io = require('socket.io-client')
+
 var account_constructor = require('./login')
 /* var main = require('./main') */
 var through = require('through')
@@ -5,59 +7,40 @@ var through = require('through')
 
 var Estate = require('Estate')
 
-var io = require('socket.io-client')
-
-var source = io.connect('http://localhost:8000')
+var source = io.connect('http://localhost:7000')
   , state = new Estate
+  , error = new EE
 
-var user = new EE
-  , error = through()
-
-
-var account = account_constructor(error, user, source)
-
-source.on('login', function() {
- alert("Holy Shit!")
-})
-
-
-user.on('login', function() {
- alert("womp!")
-})
+var account = account_constructor(error, source)
 
 // State could be maintained on the back end.
-state.listen(user, 'login', ['account'])
 state.listen(source, 'login', ['account'])
-state.listen(user, 'logout', ['account'])
-state.listen(error, 'data', ['error'])
+state.listen(source, 'logout', ['account'])
+state.listen(source, 'error', ['error'])
+state.listen(source, 'player_info', ['players_incoming'])
 
 state.on('data', show)
 
 function show(state) {
-  console.log("STATE CHANGED:", state)
+  console.log(state)
 
   var errors_el = document.querySelector("#errors")
-    , account_el = document.querySelector("#content")
+    , account_el = document.querySelector("#account")
     , players_el = document.querySelector("#players")
 
-  account_el.innerHTML = account.render(account_el, state)
-  // errors.innerHTML = render_errors(errors, state)
-  // players.innerHTML = render_players(players, state)
+  account.render(account_el, state)
+  render_errors(errors_el, state)
 }
 
 function render_errors(el, state) {
-  el.innerHTML = "Wooops!"
-}
-
-
-function render_account(el, state) {
-  el.innerHTML = JSON.stringify(state.account)
+  if(state.error) {
+    el.innerHTML = state.error + "!"
+  }
 }
 
 
 function render_players(el, state) {
-  el.innerHTML = JSON.stringify(state.account)
+  if(state.player_incoming) {
+    el.innerHTML = JSON.stringify(state.players)
+  }
 }
-
-
-  

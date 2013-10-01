@@ -1,4 +1,5 @@
 var qs = require('querystring')
+  , mustache = require('mustache').render
   , ever = require('ever')
   , util = require('util')
   , $ = require('sizzle')
@@ -6,37 +7,51 @@ var qs = require('querystring')
 
 module.exports = setup
 
-function setup(error, user, source) {
-  var account = new Login(error, user, source) 
+function setup(error, source) {
+  var account = new Login(error, source) 
+
+  account.login_html = fs.readFileSync(
+    __dirname + '/../static/register.html'
+  )
+
+  account.logged_in_template = fs.readFileSync(
+      __dirname + '/template/logged_in.html'
+  )
 
   hash_login(try_hash)
 
-  account.source.on('login failed', login_failed)
-  account.source.once('login success', account.login_success)
-
   return account
-
 
   function try_hash(err, you) {
     if(err) {
-      account.user.emit('login')
-      return
+      return source.emit('login')
     }
 
     source.emit('login', you)
   }
+}
 
-  function login_failed(message) {
-     account.error.queue(message)
-     window.location.hash = ''
+function hash_login(ready) {
+  if(window.location.hash.length > 1) {
+    var hash = qs.parse(window.location.hash.slice(1))
+
+    if(hash.nick && hash.email) {
+      you.nick = hash.nick
+      you.email = hash.email
+
+      return ready(null, you)
+    }
   }
+
+  return ready(new Error('No Hash Login'))
 }
 
 
-function Login(error, user, source) {
+
+function Login(error, source) {
   this.error = error
   this.source = source
-  this.user = user
+  this.logged_in_rendered = false
 }
 
 var cons = Login
@@ -46,18 +61,20 @@ proto.constructor = cons
 
 
 proto.render = function(el, state) {
+  var self = this
+
+  window.location.hash = qs.parse(state.account) || ''
 
   if(!state.account) {
-    console.log("HERE")
     form_login(el, try_form)
+  } else if(!self.logged_in_rendered){
+    self.logged_in_rendered = true
+    el.innerHTML = mustache(self.logged_in_template, state.account)
   }
 
   function form_login(el, ready) {
-    var login_html = fs.readFileSync(
-      __dirname + '/../static/register.html'
-    )
 
-    el.innerHTML = login_html
+    el.innerHTML = self.login_html
 
     var form = $('form', el)[0]
       , form_events = ever(form)
@@ -77,39 +94,18 @@ proto.render = function(el, state) {
       var you = {}
       you.email = email.value
       you.nick = nick.value
-      ready(you)
+      ready(null, you)
     }
   }
 
   function try_form(err, you) {
     if(err) {
-      error.queue(err) 
+      return self.source.emit('error', err)
     }
 
-    source.emit('login', you)
+    self.source.emit('login', you)
   }
 }
 
-proto.login_success = function(you) {
-   window.location.hash = qs.stringify(you)
-
-   this.source.removeAllListeners('login failed')
-   this.user.emit('login', you)
-}
-
-function hash_login(ready) {
-  if(window.location.hash.length > 1) {
-    var hash = qs.parse(window.location.hash.slice(1))
-
-    if(hash.nick && hash.email) {
-      you.nick = hash.nick
-      you.email = hash.email
-
-      return ready(null, you)
-    }
-  }
-
-  return ready(new Error('No Hash Login'))
-}
 
 
