@@ -15,7 +15,7 @@ function setup(error, source) {
   )
 
   account.logged_in_template = fs.readFileSync(
-      __dirname + '/template/logged_in.html'
+    __dirname + '/template/logged_in.html'
   )
 
   hash_login(try_hash)
@@ -70,32 +70,7 @@ proto.render = function(el, state) {
   } else if(!self.logged_in_rendered){
     self.logged_in_rendered = true
     el.innerHTML = mustache(self.logged_in_template, state.account)
-  }
-
-  function form_login(el, ready) {
-
-    el.innerHTML = self.login_html
-
-    var form = $('form', el)[0]
-      , form_events = ever(form)
-
-    form_events
-      .on('submit', preventDefault)
-      .on('submit', send)
-
-    function preventDefault(ev) {
-      ev.preventDefault()
-    }
-
-    function send(ev) {
-      var email = $('#email', form)[0]
-        , nick = $('#nick', form)[0]
-
-      var you = {}
-      you.email = email.value
-      you.nick = nick.value
-      ready(null, you)
-    }
+    bind_log_out(el)
   }
 
   function try_form(err, you) {
@@ -105,7 +80,44 @@ proto.render = function(el, state) {
 
     self.source.emit('login', you)
   }
+
+  function bind_log_out(el) {
+    var logout_el = $('[rel=logout]', el)[0]
+    logout_events = ever(logout_el)
+
+    logout_el
+      .on('click', preventDefault)
+      .on('click', logout)
+  }
+
+  function logout(ev) {
+    self.source.emit('logout', state.account)
+  }
 }
 
 
 
+function preventDefault(ev) {
+  ev.preventDefault()
+}
+
+function form_login(el, ready) {
+  el.innerHTML = self.login_html
+
+  var form = $('form', el)[0]
+    , form_events = ever(form)
+
+  form_events
+    .on('submit', preventDefault)
+    .on('submit', send)
+
+  function send(ev) {
+    var email = $('#email', form)[0]
+      , nick = $('#nick', form)[0]
+
+    var you = {}
+    you.email = email.value
+    you.nick = nick.value
+    ready(null, you)
+  }
+}

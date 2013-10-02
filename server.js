@@ -39,6 +39,13 @@ function commit(socket) {
   socket.on('login', login)
   socket.on('logout', logout)
 
+  function logout(data) {
+    db.del(data.nick, on_delete_player)
+  }
+
+  function on_delete_player() {
+    socket.emit('logout')
+  }
 
   function login(data) {
     if(!data || !data.nick || !data.email) {
@@ -107,13 +114,6 @@ function exclude_current(player) {
   }
 }
 
-function logout(data) {
-  db.del(data.nick, delete_player)
-
-  function delete_player() {
-    console.log('deleting', arguments)
-  }
-}
 
 function display_payers() {
   var players = db.createReadStream()

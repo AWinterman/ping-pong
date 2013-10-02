@@ -22,7 +22,7 @@ state.listen(source, 'player_info', ['players_incoming'])
 state.on('data', show)
 
 function show(state) {
-  console.log(state)
+  console.log('state:', state)
 
   var errors_el = document.querySelector("#errors")
     , account_el = document.querySelector("#account")
