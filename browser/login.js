@@ -63,10 +63,10 @@ proto.constructor = cons
 proto.render = function(el, state) {
   var self = this
 
-  window.location.hash = qs.parse(state.account) || ''
+  window.location.hash = qs.stringify(state.account)
 
   if(!state.account) {
-    form_login(el, try_form)
+    form_login.call(self, el, try_form)
   } else if(!self.logged_in_rendered){
     self.logged_in_rendered = true
     el.innerHTML = mustache(self.logged_in_template, state.account)
@@ -85,13 +85,14 @@ proto.render = function(el, state) {
     var logout_el = $('[rel=logout]', el)[0]
     logout_events = ever(logout_el)
 
-    logout_el
+    logout_events
       .on('click', preventDefault)
       .on('click', logout)
   }
 
   function logout(ev) {
     self.source.emit('logout', state.account)
+    self.logged_in_rendered = false
   }
 }
 
@@ -102,7 +103,7 @@ function preventDefault(ev) {
 }
 
 function form_login(el, ready) {
-  el.innerHTML = self.login_html
+  el.innerHTML = this.login_html
 
   var form = $('form', el)[0]
     , form_events = ever(form)

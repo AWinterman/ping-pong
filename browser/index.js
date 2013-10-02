@@ -11,6 +11,7 @@ var source = io.connect('http://localhost:7000')
   , state = new Estate
   , error = new EE
 
+console.log(source)
 var account = account_constructor(error, source)
 
 // State could be maintained on the back end.
@@ -35,6 +36,8 @@ function show(state) {
 function render_errors(el, state) {
   if(state.error) {
     el.innerHTML = state.error + "!"
+  } else {
+    el.innerHTML = ''
   }
 }
 
