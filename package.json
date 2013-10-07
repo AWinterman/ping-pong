@@ -18,6 +18,18 @@
   },
   "dependencies": {
     "sizzle": "~1.1.0",
-    "mustache": "~0.7.2"
+    "mustache": "~0.7.2",
+    "brfs": "0.0.8",
+    "ecstatic": "~0.4.10",
+    "ever": "0.0.3",
+    "level": "~0.17.0",
+    "estate": "0.0.2",
+    "through": "~2.3.4",
+    "concat-stream": "~1.0.1",
+    "hyperglue": "~1.3.0",
+    "socket.io": "~0.9.16",
+    "beefy": "~0.4.4",
+    "browserify": "~2.34.0",
+    "socket.io-client": "~0.9.16"
   }
 }

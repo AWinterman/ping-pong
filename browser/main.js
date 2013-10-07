@@ -1,48 +1,76 @@
-var through = require('through')
-  , hyperglue = require('hyperglue')
+var mustache = require('mustache').render
+  , through = require('through')
+  , ever = require('ever')
+  , $ = require('sizzle')
   , fs = require('fs')
 
-var html = fs.readFileSync(__dirname + '/../static/row.html');
-var rows = document.querySelector('#rows')
+var player_template = fs.readFileSync(__dirname + '/template/players.html')
+  , challenge_template = fs.readFileSync(__dirname + '/template/challenge.html')
 
-module.exports = function(source) {
-  var stream = through()
+module.exports = setup
 
-  source.on('player', stream.write.bind(stream))
+function setup(error, source) {
 
-  stream.on('error', function(err) {
-    alert(err)
-  })
+  return function render(el, state) {
+    if(state.players && state.players.length) {
+      // blow away existing list
+      ;[].forEach.call(el.childNodes, el.removeChild.bind(el))
 
-  stream
-    .pipe(report())
-    .pipe(render())
-    .pipe(through(append_html));
+      // compute the html for new list
+      var html = mustache(player_template, state)
 
-  function report() {
-    return through(function(data) {
-      console.log('reporting', data); this.queue(data)
-    })
-  }
+      // container never goes into the dom
+      var container = document.createElement('div')
+      container.insertAdjacentHTML('afterbegin', html)
 
-  function append_html(html) {
-    // TODO bind event handlers to the link before it makes it all the way through.
-    rows.innerHTML += html;
+      // but it's children do.
+      ;[].forEach.call(container.children, bind)
+    }
+
+    function bind(challenge_el) {
+
+      var them = challenge_el.attributes['data-nick'].value
+        , you = state.account ? state.account.nick : null
+
+      // If the current_el is currently being challenged, do not bind events
+      // and do not bind to dom..
+      if(is_challenged(them, state)) {
+        return
+      }
+
+      var challenge_events = ever(challenge_el)
+      challenge_events.on('click', challenge)
+
+      el.appendChild(challenge_el)
+
+      function challenge(ev) {
+        ev.preventDefault()
+        console.log(ev.target)
+
+        var challenge_context = {
+            player1: 'You'
+          , player2: them
+          , agency: false
+          , challenger: true
+        }
+
+        var html = mustache(challenge_template, challenge_context)
+
+        source.emit('challenge', you, them)
+      }
+    }
+
   }
 }
 
+function is_challenged(nick, state) {
+  if(!state.challenge) {
+    return false
+  }
 
-function render () {
-  return through(function(line) {
-    var result = hyperglue(html, {
-        '.nick': line.nick,
-        '.email': line.email,
-        '.challenge': {
-            href: '#'
-          , ref: line.nick
-          , _text: 'challenge ' + line.nick
-        }
-      }).outerHTML
-    this.queue(result)
-  })
+  for(var i = 0, len = state.challenge.length; i < len; ++i) {
+    if(state.challenge[i].indexOf(nick) > -1) {
+      return true
+    }
+  }
 }

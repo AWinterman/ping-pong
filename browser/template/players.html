@@ -1,0 +1,12 @@
+{{#players}}
+<div data-nick="{{nick}}">
+  <div class="nick">{{nick}}</div>
+  <a class="challenge" href="#" rel="{{nick}}">Challenge</a>
+</div>
+{{/players}}
+
+{{^players}}
+<div class="message">
+  Woah! You're the first one here!
+</div>
+{{/players}}

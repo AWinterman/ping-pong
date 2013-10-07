@@ -36,6 +36,7 @@ function hash_login(ready) {
     var hash = qs.parse(window.location.hash.slice(1))
 
     if(hash.nick && hash.email) {
+      var you = {}
       you.nick = hash.nick
       you.email = hash.email
 
@@ -87,10 +88,13 @@ proto.render = function(el, state) {
 
     logout_events
       .on('click', preventDefault)
-      .on('click', logout)
+      .on('click', self.logout(state))
   }
+}
 
-  function logout(ev) {
+proto.logout = function(state) {
+  var self = this
+  return function(ev) {
     self.source.emit('logout', state.account)
     self.logged_in_rendered = false
   }
