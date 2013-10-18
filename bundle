@@ -11,9 +11,9 @@ function spinner {
 
   I=0 
   while : ; do
-    echo -ne ${waiter[$I % 5]}'\r'
+    echo -ne ${waiter[$I]}'\r'
     sleep 0.1
-    I=$[I+1]
+    I=$[I+1 % 5]
   done
 }
 
