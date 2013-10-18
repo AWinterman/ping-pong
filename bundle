@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+function spinner {
+  waiter[0]='[   ]'
+  waiter[1]='[ \ ]'
+  waiter[2]='[ | ]'
+  waiter[3]='[ / ]'
+  waiter[4]='[ - ]'
+
+  echo 'browserifying ...'
+
+  I=0 
+  while : ; do
+    echo -ne ${waiter[$I % 5]}'\r'
+    sleep 0.1
+    I=$[I+1]
+  done
+}
+
+spinner &
+PID=$!
+
+browserify -t brfs --debug browser/index.js > static/bundle.js
+
+kill -9 $PID
+echo "all done!"

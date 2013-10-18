@@ -1,12 +1,13 @@
 var concat = require('concat-stream')
   , through = require('through')
-
+  , error = require('../error')
 
 module.exports = wrap_commit
 
-function wrap_commit(db) { 
+function wrap_commit(db) {
+
+
   return function commit(socket) {
-    var account
     socket.on('login', login)
     socket.on('logout', logout)
     socket.on('players', display_players)
@@ -14,11 +15,11 @@ function wrap_commit(db) {
 
     db.on('del', display_players)
     db.on('put', display_players)
-
   }
 
   function login(data) {
     var self = this
+
     if(!data || !data.nick || !data.email) {
       return self.emit('login')
     }
@@ -26,13 +27,14 @@ function wrap_commit(db) {
     db.get(data.nick, got)
 
     function got(err) {
+
       if(err && err.notFound) {
         self.set('nick', data.nick, function() {
-          account = data.nick
           db.put(data.nick, data.email, wrote)
         })
       } else if(err) {
-        self.emit('error', JSON.stringify({message: "Data base error"}))
+        error.emit(self, error.database)
+
         return
       }
 
@@ -42,7 +44,8 @@ function wrap_commit(db) {
       // This way I can check for errors and remove them easily, etc.
       //
       // I think I should return status codes too.
-      self.emit('error', JSON.stringify({message: 'player exists'}))
+      error.emit(self, error.player_exists)
+
       return
     }
 
@@ -60,8 +63,9 @@ function wrap_commit(db) {
 
 
   function disconnect() {
+
     var self = this
-    
+
     self.get('nick', handle_disconnect)
 
     function handle_disconnect(err, nick) {
@@ -86,7 +90,7 @@ function wrap_commit(db) {
       you.email = data.value
       this.queue(you)
     })
-    
+
     self.get('nick', emit)
 
     function emit(err, data) {
@@ -107,19 +111,17 @@ function wrap_commit(db) {
     db.get(you, you_are_there)
 
     function you_are_there(err, yourdata) {
-      var client_error = read_error_handler(self, 'No such player', 'missing')
-      if(client_error) {
-        return self.emit('error', client_error)
-      }
+      var client_error = read_error_emitter(self, err)
 
       db.get(them, they_are_there)
 
     }
 
     function they_are_there(err, data) {
-      var client_error = read_error_handler(self, 'No such player', 'missing')
-      if(client_error) {
-        self.emit('error', client_error)
+      var found_error = read_error_emitter(socket, err)
+
+      if(found_error) {
+        return
       }
 
       // both reads have succeeded, emit the challenge to the clients.
@@ -129,6 +131,7 @@ function wrap_commit(db) {
 
   function logout(data) {
     var self = this
+
     if(data) {
       db.del(data.nick, on_delete_player)
     }
@@ -139,22 +142,21 @@ function wrap_commit(db) {
   }
 }
 
-function read_error_handler(source, msg, extra) {
-  return function(err) {
-    var client_error 
+function read_error_emitter(source, err) {
+  var self = this
+  if(err && err.notFound) {
+    error.emit(self, error.player_missing)
 
-    if(err && err.notFound) {
-      client_error = {}
-      client_error.message = msg
-      client_error['extra'] = extra 
-    } else if(err) {
-      client_error = {}
-      client_error.message = 'database error'
-      client_error.error = err
-    }
-
-    return JSON.stringify(client_error)
+    return true
   }
+
+  if(err) {
+    error.emit(self, error.database)
+
+    return true
+  }
+
+  return false
 }
 
 function exclude_you(nick) {

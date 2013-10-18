@@ -1,5 +1,5 @@
-var qs = require('querystring')
-  , mustache = require('mustache').render
+var mustache = require('mustache').render
+  , qs = require('querystring')
   , ever = require('ever')
   , util = require('util')
   , $ = require('sizzle')
@@ -7,15 +7,15 @@ var qs = require('querystring')
 
 module.exports = setup
 
-function setup(error, source) {
-  var account = new Login(error, source) 
+function setup(source) {
+  var account = new Login(source)
 
   account.login_html = fs.readFileSync(
-    __dirname + '/../static/register.html'
+      __dirname + '/../static/register.html'
   )
 
   account.logged_in_template = fs.readFileSync(
-    __dirname + '/template/logged_in.html'
+      __dirname + '/template/logged_in.html'
   )
 
   hash_login(try_hash)
@@ -37,6 +37,7 @@ function hash_login(ready) {
 
     if(hash.nick && hash.email) {
       var you = {}
+
       you.nick = hash.nick
       you.email = hash.email
 
@@ -47,19 +48,16 @@ function hash_login(ready) {
   return ready(new Error('No Hash Login'))
 }
 
-
-
-function Login(error, source) {
-  this.error = error
+function Login(source) {
   this.source = source
   this.logged_in_rendered = false
 }
 
 var cons = Login
+
 var proto = cons.prototype
 
 proto.constructor = cons
-
 
 proto.render = function(el, state) {
   var self = this
@@ -67,24 +65,18 @@ proto.render = function(el, state) {
   window.location.hash = qs.stringify(state.account)
 
   if(!state.account) {
-    form_login.call(self, el, try_form)
-  } else if(!self.logged_in_rendered){
+    form_login.call(self, el)
+  } else if(!self.logged_in_rendered) {
     self.logged_in_rendered = true
     el.innerHTML = mustache(self.logged_in_template, state.account)
     bind_log_out(el)
   }
 
-  function try_form(err, you) {
-    if(err) {
-      return self.source.emit('error', err)
-    }
-
-    self.source.emit('login', you)
-  }
-
   function bind_log_out(el) {
+
     var logout_el = $('[rel=logout]', el)[0]
-    logout_events = ever(logout_el)
+
+    var logout_events = ever(logout_el)
 
     logout_events
       .on('click', preventDefault)
@@ -94,23 +86,23 @@ proto.render = function(el, state) {
 
 proto.logout = function(state) {
   var self = this
+
   return function(ev) {
     self.source.emit('logout', state.account)
     self.logged_in_rendered = false
   }
 }
 
-
-
 function preventDefault(ev) {
   ev.preventDefault()
 }
 
-function form_login(el, ready) {
+function form_login(el) {
   el.innerHTML = this.login_html
 
   var form = $('form', el)[0]
-    , form_events = ever(form)
+
+  var form_events = ever(form)
 
   form_events
     .on('submit', preventDefault)
@@ -121,8 +113,9 @@ function form_login(el, ready) {
       , nick = $('#nick', form)[0]
 
     var you = {}
+
     you.email = email.value
     you.nick = nick.value
-    ready(null, you)
+    self.source.emit('login', you)
   }
 }

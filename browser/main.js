@@ -9,7 +9,7 @@ var player_template = fs.readFileSync(__dirname + '/template/players.html')
 
 module.exports = setup
 
-function setup(error, source) {
+function setup(source) {
 
   return function render(el, state) {
     if(state.players && state.players.length) {
