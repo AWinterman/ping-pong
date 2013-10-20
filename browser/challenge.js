@@ -1,4 +1,5 @@
-var util = require('util')
+var mustache = require('mustache').render
+  , fs = require('fs')
 
 module.exports = setup
 
@@ -8,18 +9,27 @@ function setup(error, source) {
   return challenge
 }
 
-function Challenge(error, source) {
-  this.error = error
+function Challenge(source) {
   this.source = source
+  this.template = fs.readFileSync(__dirname + '/template/challenge.html')
 }
 
+var proto
+  , cons
 
-var cons = Login
-var proto = cons.prototype
+cons = Challenge
+proto = cons.prototype
 
 proto.constructor = cons
 
 proto.render = function(el, state) {
-}
+  if(state.source || state.target) {
+    var html  = mustache(this.template, state)
 
+    console.log('rendered', html, 'into', el)
+    el.innerHTML = html
+
+    return
+  }
+}
 

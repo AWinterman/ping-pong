@@ -3,7 +3,6 @@ var errors = {}
 module.exports = errors
 
 // screw you and your vintage browser!
-
 Object.defineProperty(
     errors
   , 'emit'
@@ -23,6 +22,17 @@ Object.defineProperty(
       , configurable: false
       , writable: false
       , value: lookup
+  }
+)
+
+Object.defineProperty(
+    errors
+  , 'resolve'
+  , {
+        enumerable: false
+      , configurable: false
+      , writable: false
+      , value: resolve_error
   }
 )
 
@@ -50,7 +60,9 @@ function lookup(idx) {
 }
 
 function emit_error(socket, error) {
-  socket.emit('error', error.idx)
+  socket.emit('error', [error.idx, error.code, error.message])
 }
 
-
+function resolve_error(socket, error) {
+  socket.emit('resolved', [error.idx, error.code, error.message])
+}

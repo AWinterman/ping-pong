@@ -4,17 +4,21 @@ var concat = require('concat-stream')
 
 module.exports = wrap_commit
 
-function wrap_commit(db) {
+function wrap_commit(db, all_sockets) {
+  db.on('del', display_players(all_sockets))
+  db.on('put', display_players(all_sockets))
 
+  var connections = {}
 
-  return function commit(socket) {
+  return commit
+
+  function commit(socket) {
+    // commit handles individual socket connections.
+
     socket.on('login', login)
     socket.on('logout', logout)
-    socket.on('players', display_players)
+    socket.on('players', display_players(socket))
     socket.on('challenge', challenge)
-
-    db.on('del', display_players)
-    db.on('put', display_players)
   }
 
   function login(data) {
@@ -27,23 +31,21 @@ function wrap_commit(db) {
     db.get(data.nick, got)
 
     function got(err) {
-
       if(err && err.notFound) {
         self.set('nick', data.nick, function() {
           db.put(data.nick, data.email, wrote)
         })
-      } else if(err) {
+
+        return
+      }
+
+      if(err) {
         error.emit(self, error.database)
 
         return
       }
 
       self.emit('login')
-      // there should be a module which is nothing but a hash from errors to
-      // their string values, which can be shared between server and browser.
-      // This way I can check for errors and remove them easily, etc.
-      //
-      // I think I should return status codes too.
       error.emit(self, error.player_exists)
 
       return
@@ -54,13 +56,22 @@ function wrap_commit(db) {
         return process.exit(1)
       }
 
+      // resolve login based errors
+      error.resolve(self, error.player_exists)
+
+      // bind the disconect handler
       self.on('disconnect', disconnect)
-      self.emit('login', data)
-      self.emit('remove', 'player exists')
-      console.log('login of ' + data.nick + ' a success')
+
+      // save the connections in a way that it can be referenced later.
+      connections[data.nick] = self
+
+      self.set('nick', data.nick, function() {
+        // tell the client we have received and approved its login info
+        self.emit('login', data)
+        console.log('login of ' + data.nick + ' a success')
+      })
     }
   }
-
 
   function disconnect() {
 
@@ -72,60 +83,83 @@ function wrap_commit(db) {
       if(err) {
         return
       }
-      player = {}
+
+      delete connections[nick]
+
+      var player = {}
+
       player.nick = nick
       logout.call(self, player)
 
       self.del('nick')
     }
-
   }
 
-  function display_players(nick) {
-    var self = this
+  function display_players(socket) {
+    return function() {
+      var i = 0
 
-    var format = through(function(data) {
-      var you = {}
-      you.nick = data.key
-      you.email = data.value
-      this.queue(you)
-    })
+      var format = through(function(data) {
 
-    self.get('nick', emit)
+        var you = {}
 
-    function emit(err, data) {
+        you.nick = data.key
+        you.email = data.value
+        you.index = ++i
+        this.queue(you)
+      })
+
       db.createReadStream()
-        .pipe(exclude_you(data))
         .pipe(format)
         .pipe(concat(all))
-    }
 
-     function all(data) {
-       self.emit('players', data)
-     }
+      function all(data) {
+        socket.emit('players', data)
+      }
+    }
   }
 
-  function challenge(you, them) {
+  function challenge(source, target) {
     var self = this
 
-    db.get(you, you_are_there)
+    db.get(source, source_are_there)
 
-    function you_are_there(err, yourdata) {
-      var client_error = read_error_emitter(self, err)
-
-      db.get(them, they_are_there)
-
-    }
-
-    function they_are_there(err, data) {
-      var found_error = read_error_emitter(socket, err)
+    function source_are_there(err, data) {
+      var found_error = read_error_emitter(self, err)
 
       if(found_error) {
         return
       }
 
-      // both reads have succeeded, emit the challenge to the clients.
-      self.emit('challenge', [you, them])
+      db.get(target, target_are_there)
+    }
+
+    function target_are_there(err, data) {
+      var found_error = read_error_emitter(self, err)
+
+      if(found_error) {
+        return
+      }
+
+      // we now need to iterate through all the sockets except for source and
+      // the challenge target and let target know a challenge has occured.
+      console.log(source, 'challenged', target)
+
+      for(var nick in connections) {
+        if(nick === source) {
+          connections[nick].emit('challenge', null, target)
+
+          continue
+        }
+
+        if(nick === target) {
+          connections[nick].emit('challenge', source, null)
+
+          continue
+        }
+
+        connections[nick].emit('challenge', source, target)
+      }
     }
   }
 
@@ -137,37 +171,27 @@ function wrap_commit(db) {
     }
 
     function on_delete_player() {
+      // clear the data events
+      self.emit('login')
+      self.emit('players')
       self.emit('logout')
+      self.emit('')
     }
   }
 }
 
-function read_error_emitter(source, err) {
-  var self = this
+function read_error_emitter(socket, err) {
   if(err && err.notFound) {
-    error.emit(self, error.player_missing)
+    error.emit(socket, error.player_missing)
 
     return true
   }
 
   if(err) {
-    error.emit(self, error.database)
+    error.emit(socket, error.database)
 
     return true
   }
 
   return false
 }
-
-function exclude_you(nick) {
-  return through(exclude)
-
-  function exclude(data) {
-    if(data.key === nick) {
-      return
-    }
-    this.queue(data)
-  }
-}
-
-

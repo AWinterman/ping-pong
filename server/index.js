@@ -62,4 +62,6 @@ io.set('log level', 2)
 
 server.listen(7000)
 
-io.sockets.on('connection', commit(db))
+var on_connect = commit(db, io.sockets)
+
+io.sockets.on('connection', on_connect)

@@ -1,18 +1,16 @@
 <div class="headline">
-  <span class="player"> {{player1}} </span> challenged <span class="player"> {{player2}} </span>
+  {{# source }}
+    {{source}}
+  {{/source}}
+    
+  <h1><span class="player">
+      {{#source}}{{source}}{{/source}}
+      {{^source}}You{{/source}} 
+    </span> 
+    challenged 
+    <span class="player">
+      {{#target}}{{target}}{{/target}}
+      {{^target}}You{{/target}} 
+    </span>
+ </h1>
 </div>
-
-{{#agency}}
-<div>
-  <a href="#" rel="accept">Do you accept</a>
-</div>
-{{/agency}}
-
-{{#challenger}}
-<div>
-  Waiting for response...
-  <span class="spinner"></span>
-</div>
-{{/challenger}}
-
-

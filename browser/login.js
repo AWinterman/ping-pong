@@ -11,7 +11,7 @@ function setup(source) {
   var account = new Login(source)
 
   account.login_html = fs.readFileSync(
-      __dirname + '/../static/register.html'
+      __dirname + '/template/register.html'
   )
 
   account.logged_in_template = fs.readFileSync(
@@ -60,12 +60,14 @@ var proto = cons.prototype
 proto.constructor = cons
 
 proto.render = function(el, state) {
+
   var self = this
 
   window.location.hash = qs.stringify(state.account)
 
   if(!state.account) {
     form_login.call(self, el)
+    self.logged_in_rendered = false
   } else if(!self.logged_in_rendered) {
     self.logged_in_rendered = true
     el.innerHTML = mustache(self.logged_in_template, state.account)
@@ -98,7 +100,9 @@ function preventDefault(ev) {
 }
 
 function form_login(el) {
-  el.innerHTML = this.login_html
+  var self = this
+
+  el.innerHTML = self.login_html
 
   var form = $('form', el)[0]
 
