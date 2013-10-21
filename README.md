@@ -5,7 +5,7 @@ Challenge other people, see who else is looking in real time.
 
 Runnnnnnnit:
 
-node server.js
+node server/
 
 Source code is browserified by the above, although it's async and the server
 doesn't wait for it to finish, so you might have to refresh the client a few
