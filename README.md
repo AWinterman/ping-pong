@@ -7,6 +7,11 @@ Runnnnnnnit:
 
 node server/
 
+Bundle it!
+
+chmod +x ./run
+./run
+
 Source code is browserified by the above, although it's async and the server
 doesn't wait for it to finish, so you might have to refresh the client a few
 times
