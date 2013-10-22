@@ -8,10 +8,10 @@ Runnnnnnnit:
 node server/
 
 Bundle it!
-
+```
 chmod +x ./run
 ./run
-
+```
 # strange decisions
 
 You pick a user name and an email when you land on the page. This is then
