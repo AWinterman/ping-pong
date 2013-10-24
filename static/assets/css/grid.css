@@ -1,0 +1,122 @@
+/* 12 column fluid grid */
+.row {
+    clear:both;
+    margin:0 auto;
+    width:100%;
+}
+.col {
+    float:left;
+    margin-left:2.127659574468%;
+    min-height:1px;
+    position:relative;
+    width:6.382978723404%;
+}
+
+/* fluid column units */
+.col.two {width:14.893617021277%;}
+.col.three {width:23.404255319149%;}
+.col.four {width:31.914893617021%;}
+.col.five {width:40.425531914894%;}
+.col.six {width:48.936170212766%;}
+.col.seven {width:57.446808510638%;}
+.col.eight {width:65.957446808511%;}
+.col.nine {width:74.468085106383%;}
+.col.ten {width:82.978723404255%;}
+.col.eleven {width:91.489361702128%;}
+.col.twelve {margin-left:0; width:100%;}
+
+/* fluid column layout fix */
+.col:first-child {margin-left:0;}
+
+/* fluid column layout offsets */
+.col.offset-1 {margin-left:8.510638297872%;}
+.col.offset-2 {margin-left:17.021276595745%;}
+.col.offset-3 {margin-left:25.531914893617%;}
+.col.offset-4 {margin-left:34.042553191489%;}
+.col.offset-5 {margin-left:42.553191489362%;}
+.col.offset-6 {margin-left:51.063829787234%;}
+.col.offset-7 {margin-left:59.574468085106%;}
+.col.offset-8 {margin-left:68.085106382979%;}
+.col.offset-9 {margin-left:76.595744680851%;}
+.col.offset-10 {margin-left:85.106382978723%;}
+.col.offset-11 {margin-left:93.617021276596%;}
+
+/* fluid column offset sibling widths */
+.col+.col.offset-1 {margin-left:10.63829787234%;}
+.col+.col.offset-2 {margin-left:19.148936170213%;}
+.col+.col.offset-3 {margin-left:27.659574468085%;}
+.col+.col.offset-4 {margin-left:36.170212765957%;}
+.col+.col.offset-5 {margin-left:44.68085106383%;}
+.col+.col.offset-6 {margin-left:53.191489361702%;}
+.col+.col.offset-7 {margin-left:61.702127659574%;}
+.col+.col.offset-8 {margin-left:70.212765957447%;}
+.col+.col.offset-9 {margin-left:78.723404255319%;}
+.col+.col.offset-10 {margin-left:87.234042553191%;}
+
+/* alternative fluid column widths */
+.tenth, 
+.quarter, 
+.third, 
+.half, 
+.three-fourths {
+    margin-left:0;
+}
+.tenth {width:10%;}
+.quarter {width:25%;}
+.third {width:33.333333333333%;}
+.half {width:50%; margin-left:0;}
+.three-fourths {width:75%;}
+
+
+/* 12 column fixed grid */
+.row.fixed,
+.fixed .row {width:940px;}
+.fixed .col {
+    margin-left:20px;
+    width:60px;
+}
+
+/* fixed column units */
+.fixed .col.two {width:140px;}
+.fixed .col.three {width:220px;}
+.fixed .col.four {width:300px;}
+.fixed .col.five {width:380px;}
+.fixed .col.six {width:460px;}
+.fixed .col.seven {width:540px;}
+.fixed .col.eight {width:620px;}
+.fixed .col.nine {width:700px;}
+.fixed .col.ten {width:780px;}
+.fixed .col.eleven {width:860px;}
+.fixed .col.twelve {margin-left:0; width:940px;}
+
+/* fixed column layout fix */
+.fixed .col:first-child {margin-left:0;}
+
+/* fixed column layout offsets */
+.fixed .col.offset-1 {margin-left:80px;}
+.fixed .col.offset-2 {margin-left:160px;}
+.fixed .col.offset-3 {margin-left:240px;}
+.fixed .col.offset-4 {margin-left:320px;}
+.fixed .col.offset-5 {margin-left:400px;}
+.fixed .col.offset-6 {margin-left:480px;}
+.fixed .col.offset-7 {margin-left:560px;}
+.fixed .col.offset-8 {margin-left:640px;}
+.fixed .col.offset-9 {margin-left:720px;}
+.fixed .col.offset-10 {margin-left:800px;}
+.fixed .col.offset-11 {margin-left:880px;}
+
+/* fixed column offsets sibling widths */
+.fixed .col+.col.offset-1 {margin-left:100px;}
+.fixed .col+.col.offset-2 {margin-left:180px;}
+.fixed .col+.col.offset-3 {margin-left:260px;}
+.fixed .col+.col.offset-4 {margin-left:340px;}
+.fixed .col+.col.offset-5 {margin-left:420px;}
+.fixed .col+.col.offset-6 {margin-left:500px;}
+.fixed .col+.col.offset-7 {margin-left:580px;}
+.fixed .col+.col.offset-8 {margin-left:660px;}
+.fixed .col+.col.offset-9 {margin-left:740px;}
+.fixed .col+.col.offset-10 {margin-left:820px;}
+.fixed .col+.col.offset-11 {margin-left:900px;}
+
+/* clear floats */
+.row:after {clear:both;content:".";display:block;height:0;visibility:hidden;}
