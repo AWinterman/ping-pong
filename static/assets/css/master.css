@@ -188,7 +188,7 @@ input[type="file"] {
 button,
 input[type="submit"] {
     background:#e82727;
-    border:1px solid #fff;
+    border:2px solid #fff;
     border-radius:4px;
     /* box-shadow:#fff 0 1px 0 inset;*/
     color:#fff;
@@ -281,7 +281,7 @@ button:focus {
     display:inline-block;
     margin:0;
 }
-.btn.challenge {
+.challenge-btn {
     display:inline-block;
     float:right;
     vertical-align:middle;
@@ -300,16 +300,61 @@ button:focus {
     font-weight:bold;
     vertical-align:middle;
 }
+.challenge-text{
+    background:url(/assets/images/challenge-text.png) no-repeat;
+    background-size:131px 22px;
+    display:inline-block;
+    height:22px;
+    overflow:hidden;
+    text-indent:-9999em;
+    vertical-align:middle;
+    width:131px;
+    -webkit-animation:wobble .5s ease-in-out;
+}
 .versus {
     background:url(/assets/images/vs.png) no-repeat;
-    background-size:140px 90px;
+    background-size:150px 90px;
     display:inline-block;
     height:90px;
     overflow:hidden;
     text-indent:-9999em;
     vertical-align:middle;
-    width:140px;
+    width:150px;
     -webkit-animation:wobble .5s ease-in-out;
+}
+.challenge-accepted {
+    background:url(/assets/images/challenge-accepted.png) no-repeat;
+    background-size:245px 195px;
+    height:195px;
+    left:50%;
+    margin:0 0 0 -122px;
+    position:absolute;
+    top:100px;
+    width:245px;
+    z-index:4;
+}
+.challenge-accepted .player-1 {
+    text-align:right;
+    vertical-align:top;
+}
+.challenge-accepted .player-2 {
+    vertical-align:bottom;
+}
+.errors {
+    text-align:center;
+}
+.btn {
+    background:#e82727;
+    border:2px solid #fff;
+    border-radius:4px;
+    color:#fff;
+    display:inline-block;
+    font-weight:bold;
+    padding:8px 6px;
+    
+}
+.btn:hover {
+    color:#fff;
 }
 @-webkit-keyframes bounce-in {
     0% {
