@@ -19,9 +19,9 @@ function wrap_commit(db, all_sockets) {
       , args = [[], [null, null], []]
 
     socket.on('players', display_players(socket, db))
-    socket.on('challenge', challenge.make(db, connections))
-    socket.on('cancel', challenge.cancel(connections))
-    socket.on('accept', challenge.accept(connections))
+    socket.on('challenge', make(db, connections))
+    socket.on('cancel', cancel(all_sockets))
+    socket.on('accept', accept(all_sockets))
 
     socket.on('login', account.login(db, connections))
     socket.on('logout', account.logout(db, connections))
@@ -37,7 +37,7 @@ function display_players(socket, db) {
       var you = {}
 
       you.nick = data.key
-      you.email = data.value
+      /* you.email = data.value */
       you.index = ++i
       this.queue(you)
     })
@@ -102,7 +102,17 @@ function make(db, connections) {
   }
 }
 
-function cancel_challenge(connections) {
+function excludes(nicks) {
+  return through(function(data) {
+    if(nicks.indexOf(data.nick) > -1) {
+      return
+    }
+
+    this.queue(data)
+  })
+}
+
+function cancel(connections) {
   return function(source, target) {
     connections[source].emit('challenge', null, null)
     connections[target].emit('challenge', null, null)
@@ -125,9 +135,8 @@ function read_error_emitter(socket, err) {
   return false
 }
 
-function accept(connections) {
-  return function() {
-
-
+function accept(socket, connections) {
+  return function(source, target) {
+    socket.emit('accepts', source, target)
   }
 }

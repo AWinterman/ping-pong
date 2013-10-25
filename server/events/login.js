@@ -10,7 +10,7 @@ function login(db, connections) {
     // this will be the socket object.
     var self = this
 
-    if(!data || !data.nick || !data.email) {
+    if(!data || !data.nick /* || !data.email */) {
       return self.emit('login')
     }
 
@@ -19,7 +19,7 @@ function login(db, connections) {
     function got(err) {
       if(err && err.notFound) {
         self.set('nick', data.nick, function() {
-          db.put(data.nick, data.email, wrote)
+          db.put(data.nick, true, wrote)
         })
 
         return

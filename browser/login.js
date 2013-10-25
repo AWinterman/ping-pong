@@ -35,11 +35,11 @@ function hash_login(ready) {
   if(window.location.hash.length > 1) {
     var hash = qs.parse(window.location.hash.slice(1))
 
-    if(hash.nick && hash.email) {
+    if(hash.nick /* && hash.email */) {
       var you = {}
 
       you.nick = hash.nick
-      you.email = hash.email
+      /* you.email = hash.email */
 
       return ready(null, you)
     }
@@ -113,12 +113,12 @@ function form_login(el) {
     .on('submit', send)
 
   function send(ev) {
-    var email = $('#email', form)[0]
-      , nick = $('#nick', form)[0]
+    /* var email = $('#email', form)[0] */
+    var nick = $('#nick', form)[0]
 
     var you = {}
 
-    you.email = email.value
+    /* you.email = email.value */
     you.nick = nick.value
     self.source.emit('login', you)
   }

@@ -1,6 +1,7 @@
 var mustache = require('mustache').render
   , $ = require('sizzle')
   , fs = require('fs')
+  , ever = require('ever')
 
 module.exports = setup
 
@@ -24,25 +25,26 @@ proto = cons.prototype
 proto.constructor = cons
 
 proto.render = function(el, state) {
-
   var nulls = state.source === null && state.target === null
 
   if(state.source || state.target || nulls) {
+    var self = this
+
     var html  = nulls ? '' : mustache(this.template, state)
 
     el.innerHTML = html
 
     var cancels = $('[rel=cancel]', el)
-      , accept_events = ever($('[rel=accept]', el)[0]
-
+      , accept_event = ever($('[rel=accept]', el)[0])
 
     for(var i = 0, len = cancels.length; i < len; ++i) {
-      cancels[i].on('click', send_cancel)
+      ever(cancels[i]).on('click', send_cancel)
     }
 
-    accepts_event.on('click', send_accept)
+    accept_event.on('click', send_accept)
 
-    function sends_cancel(ev) {
+    function send_cancel(ev) {
+      console.log('sends')
       ev.preventDefault()
       self.source.emit('cancel', state.source, state.target)
     }
