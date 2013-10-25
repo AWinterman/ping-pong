@@ -21,7 +21,7 @@ function wrap_commit(db, all_sockets) {
     socket.on('players', display_players(socket, db))
     socket.on('challenge', make(db, connections))
     socket.on('cancel', cancel(connections))
-    socket.on('accept', accept(all_sockets))
+    socket.on('accept', accept(connections))
 
     socket.on('login', account.login(db, connections))
     socket.on('logout', account.logout(db, connections))
@@ -135,8 +135,10 @@ function read_error_emitter(socket, err) {
   return false
 }
 
-function accept(socket) {
+function accept(connections) {
   return function(source, target) {
-    socket.emit('accept', source, target)
+    connections[target].emit('accept', source, target)
+    console.log(connections[source])
+    connections[source].emit('accept', target, source)
   }
 }

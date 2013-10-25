@@ -1,8 +1,8 @@
 <div class="challenge-accepted hidden">
   <img src="/assets/images/challenge-accepted.png" alt="challenge accepted" />
-  <span class="player-1"></span>
+  <span class="player-2"></span>
   <span class="versus">VS</span>
-  <span clas="player-2"></span>
+  <span class="player-1"></span>
 </div>
 
 <div class="fight">
@@ -17,14 +17,14 @@
       {{^target}}You{{/target}} 
     </span>
     <div>
-      {{#source}}
-      <a href="#" rel="cancel" class="btn">Cancel Challenge Request</a>
-      {{/source}}
-      
       {{#target}}
+      <a href="#" rel="cancel" class="btn">Cancel Challenge Request</a>
+      {{/target}}
+      
+      {{#source}}
       <a href="#" rel="accept" class="btn">Accept Challenge</a> or <a
         rel="cancel" href="#">decline</a>
-      {{/target}}
+      {{/source}}
     </div>
     <h3 class="hidden">Challenge Cancelled :(</h3>
   </div>

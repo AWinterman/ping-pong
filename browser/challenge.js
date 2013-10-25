@@ -32,7 +32,11 @@ proto.render = function(el, state) {
 
     var html  = nulls ? '' : mustache(this.template, state)
 
-    el.innerHTML = html
+    if(!html) {
+      el.innerHTML = html
+    } else {
+      el.insertAdjacentHTML('afterbegin', html)
+    }
 
     var cancels = $('[rel=cancel]', el)
       , accepts = $('[rel=accept]', el)
@@ -46,14 +50,13 @@ proto.render = function(el, state) {
     }
 
     function send_cancel(ev) {
-      console.log('sends')
       ev.preventDefault()
       self.source.emit('cancel', state.source, state.target)
     }
 
     function send_accept(ev) {
       ev.preventDefault()
-      self.source.emit('accept', state.source, state.target)
+      self.source.emit('accept', state.source || state.account.nick, state.target || state.account.nick)
     }
 
     return
@@ -61,6 +64,7 @@ proto.render = function(el, state) {
 }
 
 proto.cancel = function(el, state) {
+
 
 }
 
@@ -70,7 +74,8 @@ proto.accept = function(el, state) {
 
     parent_el.classList.remove('hidden')
 
-    $('.player-1', parent_el)[0].innerHTML(mustache('{{accept-source}}', state))
-    $('.player-2', parent_el)[0].innerHTML(mustache('{{accept-target}}', state))
+    $('.player-1', parent_el)[0].innerHTML = mustache(state['accept-source'] ? '{{accept-source}}' : 'YOU', state)
+    $('.player-2', parent_el)[0].innerHTML = mustache(state['accept-target'] ? '{{accept-target}}' : 'YOU', state)
+
   }
 }
