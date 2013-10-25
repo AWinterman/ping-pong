@@ -322,17 +322,17 @@ button:focus {
     width:150px;
 }
 .challenge-accepted {
-
+    padding:20px;
+    position:absolute;
+    text-align:center;
+    top:0;
+    -webkit-box-sizing:border-box;
+    -moz-box-sizing:border-box;
+    box-sizing:border-box;
+    -webkit-animation:bounce-in 1s ease-in-out;
 }
-.challenge-accepted h2 {
-    background:url(/assets/images/challenge-accepted.png) no-repeat;
-    background-size:290px 490px;
-    height:290px;
-    left:50%;
-    margin:0 0 20px;
-    overflow:hidden;
-    text-indent:-9999em;
-    width:490px;
+.challenge-accepted img {
+    max-width:100%;
 }
 .challenge-accepted .player-1 {
     text-align:right;
