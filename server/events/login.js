@@ -1,107 +1,100 @@
 var error = require('../../error')
 
-module.exports = function(db, socket, connections) {
-  var account = new Account(db, socket, connections)
-
-  return account.login.bind(account)
+module.exports = {
+    login: login
+  , logout: disconnect
 }
 
-function Account(db, socket, connections) {
-  this.db = db
-  this.socket = socket
-  this.connections = connections
-}
+function login(db, connections) {
+  return function(data) {
+    // this will be the socket object.
+    var self = this
 
-var cons = Account
-  , proto = cons.prototype
+    if(!data || !data.nick || !data.email) {
+      return self.emit('login')
+    }
 
-proto.constructor = cons
+    db.get(data.nick, got)
 
-proto.login = function(data) {
-  var self = this
+    function got(err) {
+      if(err && err.notFound) {
+        self.set('nick', data.nick, function() {
+          db.put(data.nick, data.email, wrote)
+        })
 
-  if(!data || !data.nick || !data.email) {
-    return self.socket.emit('login')
-  }
+        return
+      }
 
-  self.db.get(data.nick, got)
+      if(err) {
+        error.emit(self, error.database)
 
-  function got(err) {
-    if(err && err.notFound) {
-      self.socket.set('nick', data.nick, function() {
-        self.db.put(data.nick, data.email, wrote)
+        return
+      }
+
+      self.emit('login')
+      error.emit(self, error.player_exists)
+
+      return
+    }
+
+    function wrote(err) {
+      if(err) {
+        return process.exit(1)
+      }
+
+      // resolve login based errors
+      error.resolve(self, error.player_exists)
+
+      // bind the disconect handler
+      self.on('disconnect', disconnect(db, connections))
+
+      // save the connections in a way socket it can be referenced later.
+      connections[data.nick] = self
+
+      self.set('nick', data.nick, function() {
+        // tell the client we have received and approved its login info
+        self.emit('login', data)
       })
-
-      return
     }
-
-    if(err) {
-      error.emit(self.socket, error.database)
-
-      return
-    }
-
-    self.socket.emit('login')
-    error.emit(self.socket, error.player_exists)
-
-    return
-  }
-
-  function wrote(err) {
-    if(err) {
-      return process.exit(1)
-    }
-
-    // resolve login based errors
-    error.resolve(self.socket, error.player_exists)
-
-    // bind the disconect handler
-    self.socket.on('disconnect', self.disconnect.bind(self))
-    self.socket.on('logout', self.logout.bind(self))
-
-    // save the connections in a way that it can be referenced later.
-    self.connections[data.nick] = self.socket
-
-    self.socket.set('nick', data.nick, function() {
-      // tell the client we have received and approved its login info
-      self.socket.emit('login', data)
-      console.log('login of ' + data.nick + ' a success')
-    })
   }
 }
 
-proto.disconnect = function disconnect() {
-  var self = this
+function disconnect(db, connections) {
+  return function() {
+    var self = this
 
-  self.socket.get('nick', handle_disconnect)
+    self.get('nick', handle_disconnect)
 
-  function handle_disconnect(err, nick) {
-    if(err) {
-      return
+    function handle_disconnect(err, nick) {
+      if(err) {
+        return
+      }
+
+      delete connections[nick]
+
+      var player = {}
+
+      player.nick = nick
+      logout(db, player).call(self, player)
+
+      self.del('nick')
     }
-
-    delete self.connections[nick]
-
-    var player = {}
-
-    player.nick = nick
-    self.logout(player)
-
-    self.socket.del('nick')
   }
 }
 
-proto.logout = function logout(data) {
-  var self = this
+function logout(db, connections) {
+  return function(data) {
+    var self = this
 
-  if(data) {
-    self.db.del(data.nick, on_delete_player)
-  }
+    if(data) {
+      db.del(data.nick, on_delete_player)
+    }
 
-  function on_delete_player() {
-    // clear the data events
-    self.socket.emit('login')
-    self.socket.emit('players')
-    self.socket.emit('logout')
+    function on_delete_player() {
+      // clear the data events
+      self.emit('login')
+      self.emit('players')
+      self.emit('logout')
+    }
   }
 }

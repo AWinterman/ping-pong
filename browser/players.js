@@ -18,14 +18,18 @@ function setup(source) {
       return
     }
 
-    if(state.players && state.players.length > 1) {
-      // blow away existing list
-      state.players.sort(function(d) {
-        return d.i
-      })
+    // if account and no players
+    if(!state.players) {
+      return source.emit('players', state.account)
+    }
 
+    if(state.players.length > 1) {
       state.players = state.players.filter(function(data) {
         return state.account.nick !== data.nick
+      })
+
+      state.players.sort(function(d) {
+        return d.i
       })
 
       while(el.hasChildNodes()) {
@@ -55,8 +59,6 @@ function setup(source) {
       return
     }
 
-    // otherwise get the players.
-    return source.emit('players', state.account)
 
     function bind(challenge_el) {
 
