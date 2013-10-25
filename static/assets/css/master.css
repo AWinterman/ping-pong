@@ -322,23 +322,33 @@ button:focus {
     width:150px;
 }
 .challenge-accepted {
-
+    background:rgba(0,0,0,.4);
+    left:0;
+    height:100%;
+    padding:20px;
+    position:fixed;
+    text-align:center;
+    top:0;
+    width:100%;
+    -webkit-box-sizing:border-box;
+    -moz-box-sizing:border-box;
+    box-sizing:border-box;
 }
-.challenge-accepted h2 {
-    background:url(/assets/images/challenge-accepted.png) no-repeat;
-    background-size:290px 490px;
-    height:290px;
-    left:50%;
-    margin:0 0 20px;
-    overflow:hidden;
-    text-indent:-9999em;
-    width:490px;
+.challenge-accepted img {
+    max-width:100%;
+    -webkit-animation:bounce-in 1s ease-in-out;
 }
 .challenge-accepted .player-1 {
+    display:inline-block;
+    font-size:1.75em; 
+    font-weight:bold;
     text-align:right;
     vertical-align:top;
 }
 .challenge-accepted .player-2 {
+    display:inline-block;
+    font-size:1.75em; 
+    font-weight:bold;
     vertical-align:bottom;
 }
 .errors {
