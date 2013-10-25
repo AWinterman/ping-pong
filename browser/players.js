@@ -18,7 +18,7 @@ function setup(source) {
       return
     }
 
-    if(state.players) {
+    if(state.players && state.players.length > 1) {
       // blow away existing list
       state.players.sort(function(d) {
         return d.i
@@ -41,8 +41,11 @@ function setup(source) {
         , mustache(player_template, state)
       )
 
-      var children = [].slice.call(container.children)
-        , child
+      var children = [].slice.call(container.children).filter(function(el) {
+        return el.className === 'players'
+      })
+
+      var child
 
       while(child = container.firstElementChild) {
         child.remove()
