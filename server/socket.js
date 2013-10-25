@@ -138,7 +138,6 @@ function read_error_emitter(socket, err) {
 function accept(connections) {
   return function(source, target) {
     connections[target].emit('accept', source, target)
-    console.log(connections[source])
     connections[source].emit('accept', target, source)
   }
 }

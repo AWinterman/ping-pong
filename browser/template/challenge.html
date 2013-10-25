@@ -17,14 +17,19 @@
       {{^target}}You{{/target}} 
     </span>
     <div>
+    {{^source}}
       {{#target}}
       <a href="#" rel="cancel" class="btn">Cancel Challenge Request</a>
       {{/target}}
+      {{/source}}
       
+      {{^target}}
       {{#source}}
       <a href="#" rel="accept" class="btn">Accept Challenge</a> or <a
         rel="cancel" href="#">decline</a>
       {{/source}}
+      {{/target}}
+      
     </div>
     <h3 class="hidden">Challenge Cancelled :(</h3>
   </div>
