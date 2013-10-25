@@ -6,23 +6,26 @@
 </div>
 
 <div class="fight">
-  <span class="player">
-    {{#source}}{{source}}{{/source}}
-    {{^source}}You{{/source}} 
-  </span> 
-  <span class="challenge-text">challenged</span>
-  <span class="player">
-    {{#target}}{{target}}{{/target}}
-    {{^target}}You{{/target}} 
-  </span>
   <div>
-    {{#source}}
-    <a href="#" rel="cancel" class="btn">Cancel Challenge Request</a>
-    {{/source}}
-    
-    {{#target}}
-    <a href="#" rel="accept" class="btn">Accept Challenge</a> or <a
-      rel="cancel" href="#">decline</a>
-    {{/target}}
+    <span class="player">
+      {{#source}}{{source}}{{/source}}
+      {{^source}}You{{/source}} 
+    </span> 
+    <span class="challenge-text">challenged</span>
+    <span class="player">
+      {{#target}}{{target}}{{/target}}
+      {{^target}}You{{/target}} 
+    </span>
+    <div>
+      {{#source}}
+      <a href="#" rel="cancel" class="btn">Cancel Challenge Request</a>
+      {{/source}}
+      
+      {{#target}}
+      <a href="#" rel="accept" class="btn">Accept Challenge</a> or <a
+        rel="cancel" href="#">decline</a>
+      {{/target}}
+    </div>
+    <h3 class="hidden">Challenge Cancelled :(</h3>
   </div>
 </div>
