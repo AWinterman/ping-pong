@@ -2,15 +2,15 @@
   {{# source }}
     {{source}}
   {{/source}}
-    
-  <h1><span class="player">
-      {{#source}}{{source}}{{/source}}
-      {{^source}}You{{/source}} 
-    </span> 
-    challenged 
+  <div class="fight">
     <span class="player">
-      {{#target}}{{target}}{{/target}}
-      {{^target}}You{{/target}} 
-    </span>
- </h1>
+        {{#source}}{{source}}{{/source}}
+        {{^source}}You{{/source}} 
+      </span> 
+     <span class="versus">VS</span>
+      <span class="player">
+        {{#target}}{{target}}{{/target}}
+        {{^target}}You{{/target}} 
+      </span>
+  </div>
 </div>
