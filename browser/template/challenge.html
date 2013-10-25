@@ -1,16 +1,15 @@
-<div class="headline">
-  {{# source }}
-    {{source}}
-  {{/source}}
-  <div class="fight">
-    <span class="player">
-        {{#source}}{{source}}{{/source}}
-        {{^source}}You{{/source}} 
-      </span> 
-     <span class="versus">VS</span>
-      <span class="player">
-        {{#target}}{{target}}{{/target}}
-        {{^target}}You{{/target}} 
-      </span>
+<div class="fight">
+  <span class="player">
+    {{#source}}{{source}}{{/source}}
+    {{^source}}You{{/source}} 
+  </span> 
+  <span class="versus">VS</span>
+  <span class="player">
+    {{#target}}{{target}}{{/target}}
+    {{^target}}You{{/target}} 
+  </span>
+  <div>
+    <a href="#" class="btn">Cancel Challenge Request</a>
+    <a href="#" class="btn">Accept Challenge</a> or <a href="#">decline</a>
   </div>
 </div>
