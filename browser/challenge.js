@@ -26,7 +26,6 @@ proto.render = function(el, state) {
   if(state.source || state.target) {
     var html  = mustache(this.template, state)
 
-    console.log('rendered', html, 'into', el)
     el.innerHTML = html
 
     return
