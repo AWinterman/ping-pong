@@ -311,6 +311,25 @@ button:focus {
     width:140px;
     -webkit-animation:wobble .5s ease-in-out;
 }
+
+.challenge-accepted {
+    background:url(/assets/iamges/challenge-accepted.png) no-repeat;
+    background-size:245px 195px;
+    height:195px;
+    left:50%;
+    margin:0 0 0 -122px;
+    position:absolute;
+    top:100px;
+    width:245px;
+}
+.challenge-accepted .player-1 {
+    text-align:right;
+    vertical-align:top;
+}
+.challenge-accepted .player-2 {
+    vertical-align:bottom;
+}
+
 @-webkit-keyframes bounce-in {
     0% {
         opacity: 0;
