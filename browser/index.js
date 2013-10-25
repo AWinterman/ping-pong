@@ -17,26 +17,13 @@ var render_players = player_constructor(source)
   , account = account_constructor(source)
   , error = setup_error(source)
 
-var report = function(name) {
-  return function() {
-    console.log(name, arguments)
-  }
-}
-
-// if(true) {
-//   source.on('login', report('login'))
-//   source.on('logout', report('logout'))
-//   source.on('players', report('players'))
-//   source.on('challenge', report('challenge'))
-//   error.on('errors', report('errors'))
-// }
-
 app_state.listen(source, 'login', ['account'])
 app_state.listen(source, 'logout', ['account'])
 app_state.listen(source, 'players', ['players'])
 app_state.listen(source, 'challenge', ['source', 'target'])
 app_state.listen(source, 'other-challenges', ['challenges'])
-app_state.listen(source, 'accepted', ['accepted'])
+app_state.listen(source, 'accept', ['accept-source', 'accept-target'])
+app_state.listen(source, 'cancel', ['cancel-source', 'cancel-target'])
 app_state.listen(error, 'errors', ['errors'])
 
 app_state.on('data', show)
@@ -44,7 +31,7 @@ app_state.on('data', show)
 var beforeunload_set = false
 
 function show(state) {
-  console.log(state)
+
   var challenge_el = document.querySelector('#challenge')
     , players_el = document.querySelector('#players')
     , account_el = document.querySelector('#account')
@@ -53,7 +40,10 @@ function show(state) {
   account.render(account_el, state)
   render_players(players_el, state)
   error.render(errors_el, state)
+
   challenge.render(challenge_el, state)
+  challenge.accept(challenge_el, state)
+  challenge.cancel(challenge_el, state)
 
   if(state.account && !beforeunload_set) {
     window.onbeforeunload = account.logout(state)

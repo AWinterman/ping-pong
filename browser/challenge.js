@@ -35,13 +35,15 @@ proto.render = function(el, state) {
     el.innerHTML = html
 
     var cancels = $('[rel=cancel]', el)
-      , accept_event = ever($('[rel=accept]', el)[0])
+      , accepts = $('[rel=accept]', el)
 
     for(var i = 0, len = cancels.length; i < len; ++i) {
       ever(cancels[i]).on('click', send_cancel)
     }
 
-    accept_event.on('click', send_accept)
+    for(var i = 0, len = accepts.length; i < len; ++i) {
+      ever(accepts[i]).on('click', send_accept)
+    }
 
     function send_cancel(ev) {
       console.log('sends')
@@ -58,6 +60,17 @@ proto.render = function(el, state) {
   }
 }
 
-proto.decline = function(el, state) {
+proto.cancel = function(el, state) {
+
 }
 
+proto.accept = function(el, state) {
+  if(state['accept-source'] || state['accept-target']) {
+    var parent_el = $('.challenge-accepted')[0]
+
+    parent_el.classList.remove('hidden')
+
+    $('.player-1', parent_el)[0].innerHTML(mustache('{{accept-source}}', state))
+    $('.player-2', parent_el)[0].innerHTML(mustache('{{accept-target}}', state))
+  }
+}
