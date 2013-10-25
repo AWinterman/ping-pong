@@ -6,8 +6,8 @@ html {
 	height:100%;
 }
 body {
-	background:#013e73;
-    box-shadow:#fff -10px -10px inset,
+    background:#013e73;
+    box-shadow:#fff -10px 0 inset,
         #fff 10px 10px inset;
 	color:#fff;
     font:100%/1.5 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -320,18 +320,19 @@ button:focus {
     text-indent:-9999em;
     vertical-align:middle;
     width:150px;
-    -webkit-animation:wobble .5s ease-in-out;
 }
 .challenge-accepted {
+
+}
+.challenge-accepted h2 {
     background:url(/assets/images/challenge-accepted.png) no-repeat;
-    background-size:245px 195px;
-    height:195px;
+    background-size:290px 490px;
+    height:290px;
     left:50%;
-    margin:0 0 0 -122px;
-    position:absolute;
-    top:100px;
-    width:245px;
-    z-index:4;
+    margin:0 0 20px;
+    overflow:hidden;
+    text-indent:-9999em;
+    width:490px;
 }
 .challenge-accepted .player-1 {
     text-align:right;
