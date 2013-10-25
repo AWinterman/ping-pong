@@ -24,6 +24,10 @@ function setup(source) {
         return d.i
       })
 
+      state.players = state.players.filter(function(data) {
+        return state.account.nick !== data.nick
+      })
+
       while(el.hasChildNodes()) {
         el.removeChild(el.lastChild)
       }

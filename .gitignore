@@ -1,0 +1,3 @@
+node_modules/
+players.db/
+static/bundle.js

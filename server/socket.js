@@ -1,4 +1,5 @@
-var concat = require('concat-stream')
+var login = require('./events/login')
+  , concat = require('concat-stream')
   , through = require('through')
   , error = require('../error')
 
@@ -14,85 +15,9 @@ function wrap_commit(db, all_sockets) {
 
   function commit(socket) {
     // commit handles individual socket connections.
-
     socket.on('login', login)
-    socket.on('logout', logout)
     socket.on('players', display_players(socket))
     socket.on('challenge', challenge)
-  }
-
-  function login(data) {
-    var self = this
-
-    if(!data || !data.nick || !data.email) {
-      return self.emit('login')
-    }
-
-    db.get(data.nick, got)
-
-    function got(err) {
-      if(err && err.notFound) {
-        self.set('nick', data.nick, function() {
-          db.put(data.nick, data.email, wrote)
-        })
-
-        return
-      }
-
-      if(err) {
-        error.emit(self, error.database)
-
-        return
-      }
-
-      self.emit('login')
-      error.emit(self, error.player_exists)
-
-      return
-    }
-
-    function wrote(err) {
-      if(err) {
-        return process.exit(1)
-      }
-
-      // resolve login based errors
-      error.resolve(self, error.player_exists)
-
-      // bind the disconect handler
-      self.on('disconnect', disconnect)
-
-      // save the connections in a way that it can be referenced later.
-      connections[data.nick] = self
-
-      self.set('nick', data.nick, function() {
-        // tell the client we have received and approved its login info
-        self.emit('login', data)
-        console.log('login of ' + data.nick + ' a success')
-      })
-    }
-  }
-
-  function disconnect() {
-
-    var self = this
-
-    self.get('nick', handle_disconnect)
-
-    function handle_disconnect(err, nick) {
-      if(err) {
-        return
-      }
-
-      delete connections[nick]
-
-      var player = {}
-
-      player.nick = nick
-      logout.call(self, player)
-
-      self.del('nick')
-    }
   }
 
   function display_players(socket) {
@@ -163,21 +88,7 @@ function wrap_commit(db, all_sockets) {
     }
   }
 
-  function logout(data) {
-    var self = this
 
-    if(data) {
-      db.del(data.nick, on_delete_player)
-    }
-
-    function on_delete_player() {
-      // clear the data events
-      self.emit('login')
-      self.emit('players')
-      self.emit('logout')
-      self.emit('')
-    }
-  }
 }
 
 function read_error_emitter(socket, err) {
