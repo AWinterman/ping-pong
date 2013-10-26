@@ -95,6 +95,7 @@ function logout(db, connections) {
       self.emit('login')
       self.emit('players')
       self.emit('logout')
+      self.emit('accept')
     }
   }
 }

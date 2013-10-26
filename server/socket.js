@@ -3,6 +3,7 @@ var challenge = require('./events/challenge')
   , concat = require('concat-stream')
   , through = require('through')
   , error = require('../error')
+  , Set = require('../set')
 
 module.exports = wrap_commit
 
@@ -52,7 +53,7 @@ function display_players(socket, db) {
   }
 }
 
-var challenges = {}
+var challenges = new Set
 
 function make(db, connections) {
   return function challenge(source, target) {
@@ -77,9 +78,7 @@ function make(db, connections) {
         return
       }
 
-      // we now need to iterate through all the sockets except for source and
-      // the challenge target and let target know a challenge has occured.
-      console.log(source, 'challenged', target)
+      challenges.add([target, source].sort())
 
       for(var nick in connections) {
         if(nick === source) {
@@ -94,10 +93,9 @@ function make(db, connections) {
           continue
         }
 
-        connections[nick].emit('challenge', source, target)
+        connections[nick].emit('challenge_list', challenges.get())
       }
 
-      challenges[source] = target
     }
   }
 }
@@ -112,10 +110,14 @@ function excludes(nicks) {
   })
 }
 
-function cancel(connections) {
+function cancel(connections, broadcast_channel) {
+  challenges.remove([target, source].sort())
+
   return function(source, target) {
-    connections[source].emit('challenge', null, null)
-    connections[target].emit('challenge', null, null)
+    broadcast_channel.emit('challenge_list', challenges.get())
+
+    connections[source].emit('cancel')
+    connections[target].emit('cancel')
   }
 }
 
@@ -135,9 +137,12 @@ function read_error_emitter(socket, err) {
   return false
 }
 
-function accept(connections) {
+function accept(connections, broadcast_channel) {
+  challenges.remove([target, source].sort())
+
   return function(source, target) {
     connections[target].emit('accept', source, target)
     connections[source].emit('accept', target, source)
+    broadcast_channel.emit('challenge_list', challenges.get())
   }
 }

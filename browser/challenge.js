@@ -30,13 +30,9 @@ proto.render = function(el, state) {
   if(state.source || state.target || nulls) {
     var self = this
 
-    var html  = nulls ? '' : mustache(this.template, state)
+    var html = mustache(this.template, state)
 
-    if(!html) {
-      el.innerHTML = html
-    } else {
-      el.insertAdjacentHTML('afterbegin', html)
-    }
+    el.innerHTML = html
 
     var cancels = $('[rel=cancel]', el)
       , accepts = $('[rel=accept]', el)
@@ -76,6 +72,11 @@ proto.accept = function(el, state) {
 
     $('.player-1', parent_el)[0].innerHTML = mustache(state['accept-source'] ? '{{accept-source}}' : 'YOU', state)
     $('.player-2', parent_el)[0].innerHTML = mustache(state['accept-target'] ? '{{accept-target}}' : 'YOU', state)
+
+    ever(parent_el).on('click', function(ev) {
+      ev.preventDefault()
+      parent_el.classList.add('hidden')
+    })
 
   }
 }
